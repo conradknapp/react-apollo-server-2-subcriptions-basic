@@ -23,6 +23,7 @@ const server = new ApolloServer({
     type Query {
       messages: [Message!]!
     }
+    # inside our resolver map, we add a Subscription resolver that returns an AsyncIterator, which listens to the events asynchronously
     type Subscription {
       messageAdded: Message
     }
