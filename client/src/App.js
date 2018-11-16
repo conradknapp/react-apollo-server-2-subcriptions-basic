@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import gql from "graphql-tag";
-import { Query } from "react-apollo";
+import { Query, Subscription } from "react-apollo";
 
 const GET_MESSAGES = gql`
   query {
@@ -11,9 +11,9 @@ const GET_MESSAGES = gql`
   }
 `;
 
-const COMMENT_ADDED = gql`
+const MESSAGE_ADDED = gql`
   subscription {
-    messageCreated {
+    messageAdded {
       id
       content
     }
@@ -21,43 +21,55 @@ const COMMENT_ADDED = gql`
 `;
 
 const App = () => (
-  <Query query={GET_MESSAGES}>
-    {({ data, loading, subscribeToMore }) => {
+  <Subscription subscription={MESSAGE_ADDED}>
+    {({ data, loading }) => {
       if (!data) return null;
-      if (loading) return <div>Loading ...</div>;
+      if (loading) return <div>Loading...</div>;
 
-      return (
-        <Messages messages={data.messages} subscribeToMore={subscribeToMore} />
-      );
+      return <div>{data.messageAdded.content}</div>;
     }}
-  </Query>
+  </Subscription>
 );
 
-class Messages extends React.Component {
-  componentDidMount() {
-    this.props.subscribeToMore({
-      document: COMMENT_ADDED,
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
+// const App = () => {
+//   return (
+//     <Query query={GET_MESSAGES}>
+//       {({ data, loading, subscribeToMore }) => {
+//         if (!data) return null;
+//         if (loading) return <div>Loading...</div>;
 
-        return {
-          messages: [subscriptionData.data.messageCreated, ...prev.messages]
-        };
-      }
-    });
-  }
+//         return (
+//           <Messages
+//             messages={data.messages}
+//             subscribeToMore={subscribeToMore}
+//           />
+//         );
+//       }}
+//     </Query>
+//   );
+// };
 
-  render() {
-    const { messages } = this.props;
+// const Messages = ({ messages, subscribeToMore }) => {
+//   useEffect(() => {
+//     subscribeToMore({
+//       document: MESSAGE_ADDED,
+//       updateQuery: (prev, { subscriptionData }) => {
+//         if (!subscriptionData.data) return prev;
 
-    return (
-      <ul>
-        {messages.map(message => (
-          <li key={message.id}>{message.content}</li>
-        ))}
-      </ul>
-    );
-  }
-}
+//         return {
+//           messages: [subscriptionData.data.messageAdded, ...prev.messages]
+//         };
+//       }
+//     });
+//   }, []);
+
+//   return (
+//     <ul>
+//       {messages.map(message => (
+//         <li key={message.id}>{message.content}</li>
+//       ))}
+//     </ul>
+//   );
+// };
 
 export default App;

@@ -1,24 +1,32 @@
-const MESSAGE_CREATED = "MESSAGE_CREATED";
+const uuidv4 = require("uuid/v4");
+const axios = require("axios");
+const MESSAGE_ADDED = "MESSAGE_ADDED";
 
 exports.resolvers = {
   Query: {
-    messages: () => [{ id: 0, content: "Hello!" }, { id: 1, content: "Bye!" }]
+    messages: () => [
+      { id: 0, content: "Hello!" },
+      {
+        id: 1,
+        content: `The local time is: ${new Date().toLocaleTimeString()}`
+      }
+    ]
   },
   Subscription: {
-    messageCreated: {
+    messageAdded: {
       subscribe: (_, args, { pubsub }) => {
-        let id = 2;
-        setInterval(() => {
-          pubsub.publish(MESSAGE_CREATED, {
-            messageCreated: {
-              id,
-              content: new Date().toLocaleTimeString()
+        setInterval(async () => {
+          const { data } = await axios.get(
+            "https://talaikis.com/api/quotes/random/"
+          );
+          pubsub.publish(MESSAGE_ADDED, {
+            messageAdded: {
+              id: uuidv4(),
+              content: data.quote
             }
           });
-
-          id++;
-        }, 2000);
-        return pubsub.asyncIterator(MESSAGE_CREATED);
+        }, 5000);
+        return pubsub.asyncIterator(MESSAGE_ADDED);
       }
     }
   }
