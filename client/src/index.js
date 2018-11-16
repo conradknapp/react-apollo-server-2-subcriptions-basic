@@ -36,13 +36,9 @@ const terminatingLink = split(
   httpLink
 );
 
-const link = ApolloLink.from([terminatingLink]);
-
-const cache = new InMemoryCache();
-
 const client = new ApolloClient({
-  link,
-  cache
+  link: ApolloLink.from([terminatingLink]),
+  cache: new InMemoryCache()
 });
 
 ReactDOM.render(

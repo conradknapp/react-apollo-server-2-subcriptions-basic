@@ -3,7 +3,8 @@ const { gql } = require("apollo-server");
 exports.typeDefs = gql`
   type Message {
     id: ID!
-    content: String!
+    quote: String!
+    author: String!
   }
 
   type Query {

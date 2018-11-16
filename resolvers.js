@@ -26,6 +26,7 @@ exports.resolvers = {
             }
           });
         }, 5000);
+        // The subscription resolver method must return AsyncIterator, which you can get from using asyncIterator method of your PubSub:
         return pubsub.asyncIterator(MESSAGE_ADDED);
       }
     }

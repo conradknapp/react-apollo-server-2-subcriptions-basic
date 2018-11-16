@@ -15,7 +15,8 @@ const MESSAGE_ADDED = gql`
   subscription {
     messageAdded {
       id
-      content
+      quote
+      author
     }
   }
 `;
@@ -26,7 +27,12 @@ const App = () => (
       if (!data) return null;
       if (loading) return <div>Loading...</div>;
 
-      return <div>{data.messageAdded.content}</div>;
+      return (
+        <div>
+          <h2>{data.messageAdded.quote}</h2>
+          <strong>{data.messageAdded.author}</strong>
+        </div>
+      );
     }}
   </Subscription>
 );
